@@ -152,7 +152,7 @@ def new_param_energy(coords, params, topology, vecs, P=1.01, T=293.15,NPT=False,
 
     mol2files = []
     for i in params:
-        mol2files.append('monomers/'+i.rsplit(' ',1)[0]+'.mol2')
+        mol2files.append('../monomers/'+i.rsplit(' ',1)[0]+'.mol2')
 
     flavor = oechem.OEIFlavor_Generic_Default | oechem.OEIFlavor_MOL2_Default | oechem.OEIFlavor_MOL2_Forcefield
     mols = []
@@ -243,7 +243,7 @@ def new_param_energy_vac(coords, params, T=293.15):
     mols = []
     for i in params:
         mols.append(i)
-    mol = 'monomers/'+mols[0]+'.mol2'
+    mol = '../monomers/'+mols[0]+'.mol2'
     K = len(params[mols[0]].keys())
 
 
@@ -313,8 +313,7 @@ MMcyc = 84.15948 #g/mol
 # We define here what data will be used for the reference states in the MBAR calculation
 # The list `files` can be of arbitrary length
 # Potential TODO: Separate these files from my other simulations and just glob grab all files in the up-to-date `references`  folder
-#files = ['cyclohexane_250_[#6X4:1]_epsilon0.1094_rmin_half1.9080.nc','cyclohexane_250_[#6X4:1]_epsilon0.110623_rmin_half1.8870.nc','cyclohexane_250_[#6X4:1]_epsilon0.114614125174_rmin_half1.88714816576.nc']
-files = ['cyclohexane_250_[#6X4:1]_epsilon0.1094_rmin_half1.9080.nc']
+files = ['cyclohexane_250_[#6X4:1]_epsilon0.1094_rmin_half1.9080.nc'] # This list can be of arbitrary length. As you generate more references, simply append them to the end of the list.
 
 # Extracting the '[#6X4:1]_epsilon<value>_rmin_half<value>' part of the strings from `files`
 file_strings = [i.rsplit('.',1)[0].split('_',2)[2] for i in files]
@@ -345,8 +344,8 @@ temp_orig = [[] for i in file_tups_sd] # temperatures from liquid sims
 temp_orig_vac = [[] for i in file_tups_sd] # temperatures from gas sims
 
 # Define number of burnin samples for the liquid and gas sims
-burnin = 101010101010101010100#1997#1949
-burnin_vac = 1000#3997#3949
+burnin = 1497#100#1997#1949
+burnin_vac = 7997#1000#3997#3949
 
 print('burnin bulk = %s' %(burnin))
 print('burnin vac = %s' %(burnin_vac))
@@ -553,7 +552,7 @@ for i in new_states:
      state_coords.append(i)
 
 # load up the packmol box from the liquid simulation for energy re-evaluation
-filename = 'packmol_boxes/cyclohexane_250.pdb'
+filename = '../packmol_boxes/cyclohexane_250.pdb'
 pdb = PDBFile(filename)
 
 # Make containers for u_kn and E_kn matrices
@@ -768,9 +767,6 @@ dHvap_expect = [np.sqrt(dener_vac**2 + ((1/250.)*dener)**2 + (101000.*1.e-3*1.e-
 Hvap_bootstrap = [((ener_vac - (1/250.)*ener) + 101000.*1.e-3*(0.024465 - v*1.e-6)) for ener_vac,ener,v in zip(E_vac_bootstrap,E_bootstrap,Vol_bootstrap)]
 dHvap_bootstrap = [np.sqrt(dener_vac**2 + ((1/250.)*dener)**2 + (101000.*1.e-3*1.e-6*dv)**2) for dener_vac,dener,dv in zip(dE_vac_bootstrap,dE_bootstrap,dVol_bootstrap)]
 
-print(dHvap_expect)
-print(dHvap_bootstrap)
-print(Vol_expect,Hvap_expect,dVol_expect,dVol_bootstrap,dHvap_expect,dHvap_bootstrap)    
 
 # Store and save data as ';' delimited csv
 df = pd.DataFrame(
